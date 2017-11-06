@@ -1,4 +1,6 @@
-((("ofSetColor" .
+((("body" .
+   [1 0 0 0])
+  ("ofSetColor" .
    [0 0 0 1 0 0 0 0 0 0])
   ("alpha" .
    [2 0 0 0 0])

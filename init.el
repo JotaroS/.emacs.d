@@ -17,22 +17,51 @@
 ;; switch window
 (global-set-key [C-tab] 'other-window)
 
+; server start for emacs-client
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
+
 ;; auto-complete（自動補完）
+;; auto-complete
 (require 'auto-complete)
 (require 'auto-complete-config)
-(global-auto-complete-mode 0.25)
+(require 'fuzzy)
+(ac-config-default)
+(setq ac-delay 0.01)
+(setq ac-auto-show-menu 0.2)
+(global-auto-complete-mode t)
+(ac-set-trigger-key "TAB")
+(setq ac-use-fuzzy t)
+(setq ac-use-menu-map t)
+(setq ac-menu-height 25)
+(setq ac-auto-start 2)
+(auto-complete-mode 1);
 
-;; font
+;;expand-region
+(require 'expand-region)
+(global-set-key (kbd "s-d") 'er/expand-region);
+
+;;delete-selection-mode
+(delete-selection-mode t)
+
+
+;; font/
 ;;(add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
-(add-to-list 'default-frame-alist '(font . "Inconsolata-g for Power Line-9"))
+;;(add-to-list 'default-frame-alist '(font . "Inconsolata-g for Power Line-9"))
+
+;;pair
+(electric-pair-mode t)
+
 
 ;; color theme
-(load-theme 'monokai t)
+(load-theme 'dracula t)
 
 ;; alpha
 (if window-system 
     (progn
-      (set-frame-parameter nil 'alpha 95)))
+      (set-frame-parameter nil 'alpha 97)))
 
 ;; 非アクティブウィンドウの背景色を設定
 (require 'hiwin)
@@ -41,15 +70,14 @@
 
 ;; line numberの表示
 (require 'linum)
-(global-linum-mode 1)
+(global-linum-mode t)
 
 ;; tabサイズ
 (setq default-tab-width 4)
 
 ;;Find-file in project
-;; (require 'find-file-in-project)
-;; (global-set-key "\C-i" 'find-file-in-project)
-
+;;(require 'find-file-in-project)
+;;(global-set-key "\C-i" 'find-file-in-project)
 
 ;; メニューバーを非表示
 (menu-bar-mode 0)
@@ -75,6 +103,9 @@
 
 ;; Ivy settei
 (ivy-mode 1)
+
+;;rg
+(require 'rg)
 
 ;;; 下記は任意で有効化
 (global-set-key "\C-s" 'swiper)
@@ -160,7 +191,7 @@
 (global-set-key (kbd "s-t") 'elscreen-create)
 (global-set-key "\C-l" 'elscreen-next)
 (global-set-key "\C-r" 'elscreen-previous)
-(global-set-key (kbd "s-d") 'elscreen-kill)
+;;(global-set-key (kbd "s-d") 'elscreen-kill)
 (set-face-attribute 'elscreen-tab-background-face nil
                     :background "grey10"
                     :foreground "grey90")
@@ -222,7 +253,7 @@
 	("98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "ff7625ad8aa2615eae96d6b4469fcc7d3d20b2e1ebc63b761a349bebbb9d23cb" default)))
  '(package-selected-packages
    (quote
-	(markdown-mode counsel-projectile projectile shell-here counsel-ebdb shell-pop ivy helm dracula-theme material-theme powerline glsl-mode git-gutter neotree monokai-theme hiwin elscreen auto-complete))))
+	(find-file-in-project rg rainbow-delimiters fuzzy smartrep multiple-cursors markdown-mode counsel-projectile projectile shell-here counsel-ebdb shell-pop ivy helm dracula-theme material-theme powerline glsl-mode git-gutter neotree monokai-theme hiwin elscreen auto-complete))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -276,6 +307,7 @@
 ;; (define-key global-map [(super shift o)] 'counsel-git-grep)
 (define-key global-map [(super shift o)] 'counsel-rg)
 
+(define-key global-map [(super r)] 'counsel-recentf)
 ;; rgrepのheader messageを消去
 (defun delete-grep-header ()
   (save-excursion
@@ -297,3 +329,31 @@
 			   '(height . 50)
 			   )
 			  special-display-frame-alist))
+
+
+(require 'multiple-cursors)
+(require 'smartrep)
+
+(declare-function smartrep-define-key "smartrep")
+
+(global-set-key (kbd "C-M-c") 'mc/edit-lines)
+(global-set-key (kbd "C-M-r") 'mc/mark-all-in-region)
+
+(global-unset-key "\C-t")
+
+(smartrep-define-key global-map "C-t"
+  '(("C-t"      . 'mc/mark-next-like-this)
+    ("n"        . 'mc/mark-next-like-this)
+    ("p"        . 'mc/mark-previous-like-this)
+    ("m"        . 'mc/mark-more-like-this-extended)
+    ("u"        . 'mc/unmark-next-like-this)
+    ("U"        . 'mc/unmark-previous-like-this)
+    ("s"        . 'mc/skip-to-next-like-this)
+    ("S"        . 'mc/skip-to-previous-like-this)
+    ("*"        . 'mc/mark-all-like-this)
+    ("d"        . 'mc/mark-all-like-this-dwim)
+    ("i"        . 'mc/insert-numbers)
+    ("o"        . 'mc/sort-regions)
+    ("O"        . 'mc/reverse-regions)))
+
+(set-face-attribute 'default nil :height 100)
