@@ -26,3 +26,9 @@ make
 cd ../
 make
 ls
+ls
+make
+ls
+npm run dev
+npm run dev
+npm

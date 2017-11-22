@@ -22,22 +22,49 @@
 (unless (server-running-p)
   (server-start))
 
+;;; *.~ とかのバックアップファイルを作らない
+(setq make-backup-files nil)
+;;; .#* とかのバックアップファイルを作らない
+(setq auto-save-default nil)
 
 ;; auto-complete（自動補完）
 ;; auto-complete
-(require 'auto-complete)
-(require 'auto-complete-config)
-(require 'fuzzy)
-(ac-config-default)
-(setq ac-delay 0.01)
-(setq ac-auto-show-menu 0.2)
-(global-auto-complete-mode t)
-(ac-set-trigger-key "TAB")
-(setq ac-use-fuzzy t)
-(setq ac-use-menu-map t)
-(setq ac-menu-height 25)
-(setq ac-auto-start 2)
-(auto-complete-mode 1);
+;; (require 'auto-complete)
+;; (require 'auto-complete-config)
+;; (require 'fuzzy)
+;; (ac-config-default)
+;; (setq ac-delay 0.01)
+;; (setq ac-auto-show-menu 0.2)
+;; (global-auto-complete-mode t)
+;; (ac-set-trigger-key "TAB")
+;; (setq ac-use-fuzzy t)
+;; (setq ac-use-menu-map t)
+;; (setq ac-menu-height 25)
+;; (setq ac-auto-start 2)
+;; (auto-complete-mode 1);
+(add-hook 'after-init-hook 'global-company-mode)
+(require 'company)
+(global-company-mode) ; 全バッファで有効にする 
+(setq company-idle-delay 0) ; デフォルトは0.5
+(setq company-minimum-prefix-length 2) ; デフォルトは4
+(setq company-selection-wrap-around t) ; 候補の一番下でさらに下に行こうとすると一番上に戻る
+
+(setq company-dabbrev-ignore-case 1)
+(setq company-dabbrev-downcase nil)
+(setq company-idle-delay 0)
+(setq company-tooltip-idle-delay 0)
+(setq company-flx-mode 1)
+;;with company c-n and c-p works
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-n") #'company-select-next)
+  (define-key company-active-map (kbd "C-p") #'company-select-previous)
+  (add-hook 'company-mode-hook (lambda ()
+                                     (add-to-list 'company-backends 'company-capf)))
+  (company-flx-mode +1)
+  (add-to-list 'company-backends '(company-capf))
+  )
+
+
 
 ;;expand-region
 (require 'expand-region)
@@ -49,14 +76,16 @@
 
 ;; font/
 ;;(add-to-list 'default-frame-alist '(font . "Source Code Pro-11"))
-;;(add-to-list 'default-frame-alist '(font . "Inconsolata-g for Power Line-9"))
+;;(add-to-list 'default-frame-alist '(font . "Inconsolata-dz for Powerline-12"))
 
 ;;pair
 (electric-pair-mode t)
 
-
 ;; color theme
 (load-theme 'dracula t)
+
+;;font modification
+
 
 ;; alpha
 (if window-system 
@@ -92,7 +121,7 @@
 (which-function-mode 1)
 
 ;; 対応する括弧をハイライト
-(show-paren-mode 1)
+
 
 ;; リージョンのハイライト
 (transient-mark-mode 1)
@@ -103,6 +132,16 @@
 
 ;; Ivy settei
 (ivy-mode 1)
+
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+
 
 ;;rg
 (require 'rg)
@@ -125,6 +164,8 @@
 (global-set-key (kbd "C-x l") 'counsel-locate)
 (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
 (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+
+
 
 ;; ;; helm設定
 ;; (require 'helm)
@@ -169,6 +210,11 @@
 ;; (helm-autoresize-mode 1)
 
 ;; (helm-mode 1)
+
+;;nodejsmode
+;;(require 'nodejs-mode)
+;;(require 'nodejs-repl)
+
 
 ;;counsel-projectil
 (counsel-projectile-on)
@@ -250,16 +296,17 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-	("98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "ff7625ad8aa2615eae96d6b4469fcc7d3d20b2e1ebc63b761a349bebbb9d23cb" default)))
+	("8ed752276957903a270c797c4ab52931199806ccd9f0c3bb77f6f4b9e71b9272" "98cc377af705c0f2133bb6d340bf0becd08944a588804ee655809da5d8140de6" "ff7625ad8aa2615eae96d6b4469fcc7d3d20b2e1ebc63b761a349bebbb9d23cb" default)))
  '(package-selected-packages
    (quote
-	(find-file-in-project rg rainbow-delimiters fuzzy smartrep multiple-cursors markdown-mode counsel-projectile projectile shell-here counsel-ebdb shell-pop ivy helm dracula-theme material-theme powerline glsl-mode git-gutter neotree monokai-theme hiwin elscreen auto-complete))))
+	(processing-mode company-tern web-mode js2-mode handlebars-mode zoom nodejs-repl company-flx company flx flx-ido find-file-in-project rg rainbow-delimiters fuzzy smartrep multiple-cursors markdown-mode counsel-projectile projectile shell-here counsel-ebdb shell-pop ivy helm dracula-theme material-theme powerline glsl-mode git-gutter neotree monokai-theme hiwin elscreen))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
 
 
 ;; スクロールは1行ごとに
@@ -287,7 +334,7 @@
 ;; smoke test
 ;; eshell + shell-pop
 ;;(setq shell-pop-shell-type '("eshell" "*eshell*" (lambda () (eshell))))
-(setq shell-pop-shell-type '("ansi-term" "*ansi-term" (lambda () (ansi-term shell-pop-term-shell))))
+(setq shell-pop-shell-type '("term" "*term" (lambda () (ansi-term shell-pop-term-shell))))
 (setq shell-pop-window-size 20)
 
   
@@ -356,4 +403,4 @@
     ("o"        . 'mc/sort-regions)
     ("O"        . 'mc/reverse-regions)))
 
-(set-face-attribute 'default nil :height 100)
+(set-face-attribute 'default nil :height 120)

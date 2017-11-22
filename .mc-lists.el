@@ -3,6 +3,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+		shell-pop
 		))
 
 (setq mc/cmds-to-run-once
